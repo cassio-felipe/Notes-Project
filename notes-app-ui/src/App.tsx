@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./App.css";
 
 type Note = {
@@ -87,8 +87,20 @@ const App = () => {
     setTitle("");
     setContent("");
     setSelectedNote(null);    
-  }
+  };
   
+  const deleteNote = (
+    event: React.MouseEvent, 
+    noteId: number
+  ) => {
+     event.stopPropagation();
+
+     const updatedNotes = notes.filter(
+      (note) => note.id !== noteId
+     );
+
+     setNotes(updatedNotes);
+  };
 
   return(
     <div className="app-container">
@@ -131,7 +143,12 @@ const App = () => {
           className="note-item" 
           onClick={() => handleClick(note)}>
           <div className="notes-header">
-            <button>x</button>
+            <button onClick={(event) => 
+              deleteNote(event, note.id)
+            }
+          >
+            x
+          </button>
           </div>
           <h2>{note.title}</h2>
           <p>{note.content}</p>
