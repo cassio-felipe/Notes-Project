@@ -32,12 +32,69 @@ app.post("/api/notes", async (req, res) => {
         });
 
         res.json(note);
+
     } catch (error) {
         res
             .status(500)
             .send("Ooops somenthing went wrong");
     }
 });
+
+app.put("/api/notes/:id", async (req, res) => {
+    const { title, content } = req.body;
+    const id = parseInt(req.params.id);
+
+    if(!title || !content) {
+        return res
+            .status(400)
+            .send("Required fields are necessary!");
+    }
+
+    if (!id || isNaN(id)) {
+        return res
+                .status(400)
+                .send("Id must be a valid number");
+    }
+
+    try {
+        const updatedNote = 
+            await prisma.note.update({
+                where: {id},
+                data: {title, content}
+            });
+
+            res.json(updatedNote);
+
+    } catch (error) {
+        res
+            .status(500)
+            .send("Ooops somenthing went wrong");
+    }
+
+})
+
+app.delete("/api/notes/:id", async (req, res) => {
+    const id = parseInt(req.params.id);
+
+    if (!id || isNaN(id)) {
+        return res
+                .status(400)
+                .send("Id must be a valid number");
+    }
+
+    try {
+        prisma.note.delete({
+            where: {id}
+        });
+
+        res.status(204).send();
+
+    } catch (error) {
+        res
+            .status(500)
+            .send("Ooops somenthing went wrong");
+    }
+})
 
 app.listen(5000, () => {
     console.log("Server running on localhost:50 00")
