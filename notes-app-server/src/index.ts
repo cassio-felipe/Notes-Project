@@ -83,7 +83,7 @@ app.delete("/api/notes/:id", async (req, res) => {
     }
 
     try {
-        prisma.note.delete({
+        await prisma.note.delete({
             where: {id}
         });
 

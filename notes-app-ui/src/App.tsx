@@ -36,29 +36,47 @@ const App = () => {
     setContent(note.content);
   };
 
-  const handleUpdateNote = (event:React.FormEvent) => {
+  const handleUpdateNote = async (event:React.FormEvent) => {
     event.preventDefault();
 
     if(!selectedNote){
       return;
     }
 
-    const updatedNote: Note = {
-      id: selectedNote.id,
-      title: title,
-      content: content
+    try {
+      
+      const response = await fetch(
+        `http://localhost:5000/api/notes/${selectedNote.id}`,
+        {
+          method: 'PUT',
+          headers: {
+            "Content-type": "application/json"
+          },
+          body: JSON.stringify({
+            title,
+            content
+          })
+        }
+      );
+
+      const updatedNote = await response.json();
+
+      const updatedNoteList = notes.map((note) =>
+        note.id === selectedNote.id
+        ? updatedNote
+        : note
+      )
+  
+      setNotes(updatedNoteList);
+      setTitle("");
+      setContent("");
+      setSelectedNote(null);
+
+    } catch (error) {
+      console.log(error);
     }
     
-    const updatedNoteList = notes.map((note) =>
-      note.id === selectedNote.id
-      ? updatedNote
-      : note
-    )
-
-    setNotes(updatedNoteList);
-    setTitle("");
-    setContent("");
-    setSelectedNote(null);
+    
   };
 
   const handleAddNote = async (
@@ -100,17 +118,30 @@ const App = () => {
     setSelectedNote(null);    
   };
   
-  const deleteNote = (
+  const deleteNote = async (
     event: React.MouseEvent, 
     noteId: number
   ) => {
-     event.stopPropagation();
+    event.stopPropagation();
 
-     const updatedNotes = notes.filter(
-      (note) => note.id !== noteId
-     );
+    try {
+    
+      await fetch(
+        `http://localhost:5000/api/notes/${noteId}`,
+        {
+          method: "DELETE"
+        }
+      );
 
-     setNotes(updatedNotes);
+      const updatedNotes = notes.filter(
+        (note) => note.id !== noteId
+       );
+  
+       setNotes(updatedNotes);    
+
+    } catch (error) {
+      
+    }
   };
 
   return(
